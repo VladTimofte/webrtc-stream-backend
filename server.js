@@ -1,5 +1,8 @@
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 3001 });
+const port = process.env.PORT || 3001;
+const wss = new WebSocket.Server({ port });
+
+console.log(`✅ WebSocket signaling server running on port ${port}`);
 
 let adminSocket = null;
 let clientSocket = null;
@@ -28,14 +31,13 @@ wss.on('connection', (socket) => {
       return;
     }
 
-    // Forward signaling messages
     if (data.to === 'client' && clientSocket) {
-      console.log('[Server] Forwarding to client:', data.payload?.type);
+      console.log('[Server] → Forward to client:', data.payload?.type);
       clientSocket.send(JSON.stringify(data.payload));
     }
 
     if (data.to === 'admin' && adminSocket) {
-      console.log('[Server] Forwarding to admin:', data.payload?.type);
+      console.log('[Server] → Forward to admin:', data.payload?.type);
       adminSocket.send(JSON.stringify(data.payload));
     }
   });
@@ -51,5 +53,3 @@ wss.on('connection', (socket) => {
     }
   });
 });
-
-console.log('WebSocket signaling server running on ws://localhost:3001');
